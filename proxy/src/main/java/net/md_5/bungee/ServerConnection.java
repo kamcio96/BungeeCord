@@ -46,33 +46,33 @@ public class ServerConnection implements Server
     @Override
     public void disconnect(String reason)
     {
-        disconnect( TextComponent.fromLegacyText( reason ) );
+        disconnect0();
     }
 
     @Override
     public synchronized void disconnect(BaseComponent... reason)
     {
-        if ( !ch.isClosed() )
-        {
-            ch.getHandle().eventLoop().schedule( new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    ch.getHandle().close();
-                }
-            }, 100, TimeUnit.MILLISECONDS );
-        }
-
+        disconnect0();
     }
 
     @Override
     public void disconnect(BaseComponent reason)
     {
-        disconnect( new BaseComponent[]
-        {
-            reason
-        } );
+        disconnect0();
+    }
+
+    private void disconnect0()
+    {
+        if ( !ch.isClosed() ) {
+            ch.getHandle().eventLoop().schedule( new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    ch.close();
+                }
+            }, 100, TimeUnit.MILLISECONDS );
+        }
     }
 
     @Override
