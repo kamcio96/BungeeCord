@@ -40,15 +40,15 @@ public class ChannelWrapper
 
     public void write(Object packet)
     {
-        if ( !closed )
+        if ( !closed && ch.isWritable() )
         {
             if ( packet instanceof PacketWrapper )
             {
                 ( (PacketWrapper) packet ).setReleased( true );
-                ch.writeAndFlush( ( (PacketWrapper) packet ).buf, ch.voidPromise() ).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+                ch.writeAndFlush( ( (PacketWrapper) packet ).buf ).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             } else
             {
-                ch.writeAndFlush( packet, ch.voidPromise() ).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+                ch.writeAndFlush( packet ).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
             }
         }
     }
@@ -68,7 +68,7 @@ public class ChannelWrapper
         if ( !closed )
         {
             closed = true;
-            ch.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE).addListener(ChannelFutureListener.CLOSE);
+            ch.writeAndFlush(packet).addListeners(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE, ChannelFutureListener.CLOSE);
         }
     }
 
