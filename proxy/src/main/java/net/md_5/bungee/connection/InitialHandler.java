@@ -524,10 +524,14 @@ public class InitialHandler extends PacketHandler implements PendingConnection
     @Override
     public void disconnect(final BaseComponent... reason)
     {
-        if ( thisState != State.STATUS && thisState != State.PING ) {
-            ch.close( new Kick( ComponentSerializer.toString( reason ) ) );
-        } else {
-            ch.close();
+        switch (thisState) {
+            case USERNAME:
+            case ENCRYPT:
+            case FINISHED:
+                ch.close( new Kick( ComponentSerializer.toString( reason ) ) );
+                break;
+            default:
+                ch.close();
         }
     }
 
