@@ -40,7 +40,7 @@ public class ChannelWrapper
 
     public void write(Object packet)
     {
-        if ( !closed )
+        if ( !closed && ch.isOpen() )
         {
             if ( packet instanceof PacketWrapper )
             {
@@ -58,8 +58,11 @@ public class ChannelWrapper
         if ( !closed )
         {
             closed = true;
-            ch.flush();
-            ch.close();
+            if ( ch.isOpen() )
+            {
+                ch.flush();
+                ch.close();
+            }
         }
     }
 
@@ -68,7 +71,10 @@ public class ChannelWrapper
         if ( !closed )
         {
             closed = true;
-            ch.writeAndFlush(packet).addListener(ChannelFutureListener.CLOSE);
+            if ( ch.isOpen() )
+            {
+                ch.writeAndFlush(packet).addListener(ChannelFutureListener.CLOSE);
+            }
         }
     }
 
